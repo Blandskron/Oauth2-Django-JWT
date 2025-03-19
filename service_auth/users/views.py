@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from users.serializers import RegisterSerializer, UserSerializer, LoginSerializer	
 from django.http import JsonResponse
-from django.shortcuts import render
+from .tokens import CustomRefreshToken 
 
 # Generación de code_verifier
 def generate_code_verifier():
@@ -71,8 +71,10 @@ class LoginView(generics.GenericAPIView):
         password = serializer.validated_data["password"]
 
         user = User.objects.filter(email=email).first()
+
         if user and user.check_password(password):
-            refresh = RefreshToken.for_user(user)
+            refresh = CustomRefreshToken.for_user(user) 
+
             return Response({
                 "access": str(refresh.access_token),
                 "refresh": str(refresh)
